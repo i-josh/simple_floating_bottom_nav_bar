@@ -70,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return FloatingBottomNavBar(
       pages: pages,
       items: bottomNavItems,
-      initialPageIndex: 0,
+      selectedIndex: 0,
       backgroundColor: Colors.green,
       bottomPadding: 10,
       elevation: 0,

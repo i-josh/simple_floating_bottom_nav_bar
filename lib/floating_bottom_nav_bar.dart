@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class FloatingBottomNavBar extends StatefulWidget {
   final List<Widget> pages;
-  final int? initialPageIndex;
+  final int selectedIndex;
   final double? elevation;
   final double? radius;
   final double? height;
@@ -13,17 +13,19 @@ class FloatingBottomNavBar extends StatefulWidget {
   final List<FloatingBottomNavItem> items;
   final TextStyle? selectedLabelStyle;
   final TextStyle? unselectedLabelStyle;
+  final Function? onItemTapped;
 
   const FloatingBottomNavBar(
       {super.key,
       required this.pages,
-      this.initialPageIndex,
+      this.selectedIndex = 0,
       this.elevation = 0,
       this.radius = 20,
       this.backgroundColor = Colors.blue,
       this.height = 65,
       this.width = 300,
       this.bottomPadding = 5,
+      this.onItemTapped,
       required this.items,
       this.selectedLabelStyle,
       this.unselectedLabelStyle});
@@ -33,27 +35,11 @@ class FloatingBottomNavBar extends StatefulWidget {
 }
 
 class _FloatingBottomNavBarState extends State<FloatingBottomNavBar> {
-  int selectedIndex = 0;
-
-  void onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
-
-  @override
-  void initState() {
-    setState(() {
-      selectedIndex = widget.initialPageIndex ?? 0;
-    });
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: widget.pages.elementAt(selectedIndex),
+        child: widget.pages.elementAt(widget.selectedIndex),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
@@ -66,22 +52,26 @@ class _FloatingBottomNavBarState extends State<FloatingBottomNavBar> {
           padding: EdgeInsets.only(bottom: widget.bottomPadding!),
           child: BottomNavigationBar(
             backgroundColor: Colors.transparent,
-            fixedColor: Colors.white,
+            fixedColor: widget.selectedLabelStyle?.color ?? Colors.white,
             elevation: widget.elevation,
             type: BottomNavigationBarType.fixed,
-            currentIndex: selectedIndex,
-            unselectedFontSize: widget.items.any((element) => element.label == null)
-                ? 0
-                : widget.unselectedLabelStyle?.fontSize ?? 14,
-            selectedFontSize: widget.items.any((element) => element.label == null)
-                ? 0
-                : widget.selectedLabelStyle?.fontSize ?? 14,
+            currentIndex: widget.selectedIndex,
+            unselectedFontSize:
+                widget.items.any((element) => element.label == null)
+                    ? 0
+                    : widget.unselectedLabelStyle?.fontSize ?? 14,
+            selectedFontSize:
+                widget.items.any((element) => element.label == null)
+                    ? 0
+                    : widget.selectedLabelStyle?.fontSize ?? 14,
             selectedLabelStyle: widget.selectedLabelStyle,
             unselectedLabelStyle: widget.unselectedLabelStyle,
-            onTap: onItemTapped,
+            onTap: widget.onItemTapped as void Function(int)?,
             items: widget.items
                 .map((item) => BottomNavigationBarItem(
-                    icon: item.inactiveIcon, activeIcon: item.activeIcon, label: item.label ?? ''))
+                    icon: item.inactiveIcon,
+                    activeIcon: item.activeIcon,
+                    label: item.label ?? ''))
                 .toList(),
           )),
     );
